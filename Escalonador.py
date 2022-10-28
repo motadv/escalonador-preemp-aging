@@ -62,6 +62,13 @@ def getNextProcess()-> Process:
     if readyQueue: return readyQueue.pop(0)
     else: return None
 
+def enterNewProcesses():
+    global timeLine
+    
+    for p in timeLine:
+        if p.enterTime == time:
+            enterReady(p)
+            timeLine.remove(p)
 
 def execute():  
     global exec, quantum, readyQueue
@@ -92,46 +99,10 @@ def execute():
             aging()
             exec = getNextProcess()
         
-
 def processEndedCallback(p: Process):
     print(f'O processo: {p.name} terminou!')
 
-
-time = 0
-quantum = 0
-readyQueue = []
-waitQueue = []
-exec = None
-
-timeLine = []
-with open("processos.in","r") as inputFile:
-    for line in inputFile:
-        timeLine.append(Process.readProcess(line))
-
-timeLine.sort(key = lambda x: x.enterTime)
-for p in timeLine:
-        if p.enterTime == time:
-            enterReady(p)
-            timeLine.remove(p)
-    
-    
-#Processing Loop base:
-#While there are processes in the system
-print("Escalonador com Prioridade, Aging e Preemp:\n")
-
-while(exec or readyQueue or waitQueue):
-    
-    #Entra processos novos na lista de pronto
-    for p in timeLine:
-        if p.enterTime == time:
-            enterReady(p)
-            timeLine.remove(p)
-
-    #Resolve o IO da fila de espera
-    waitIOs()
-    execute()
-    
-    
+def printReport():
     print(f'Estado Atual:\n')
     print(f'Tempo: {time} | Aging: {quantum}')
     print(f'Executando: ', end='')
@@ -146,4 +117,34 @@ while(exec or readyQueue or waitQueue):
     
     print("---------------------------------------------")
     
+
+time = 0
+quantum = 0
+readyQueue = []
+waitQueue = []
+exec = None
+
+timeLine = []
+with open("processos.in","r") as inputFile:
+    for line in inputFile:
+        timeLine.append(Process.readProcess(line))
+
+timeLine.sort(key = lambda x: x.enterTime)
+
+enterNewProcesses()    
+    
+#Processing Loop base:
+#While there are processes in the system
+print("Escalonador com Prioridade, Aging e Preemp:\n")
+
+while(exec or readyQueue or waitQueue):
+    
+    enterNewProcesses()
+    waitIOs()
+    execute()    
+    
+    printReport()
+    
     time += 1
+    
+print('\nFim da Sim.\n')
