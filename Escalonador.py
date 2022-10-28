@@ -30,7 +30,8 @@ def interruption():
     if exec != None:
         readyQueue.append(exec)
         exec = None
-        print('> Interrupt <')
+        with open("out.txt", "a") as out:
+            out.write('> Interrupt <\n')
 
 def enterWait(p: Process):
     waitQueue.append(p)
@@ -100,22 +101,22 @@ def execute():
             exec = getNextProcess()
         
 def processEndedCallback(p: Process):
-    print(f'O processo: {p.name} terminou!')
+    with open("out.txt", "a") as out:
+        out.write(f'O processo: {p.name} terminou!\n')
 
 def printReport():
-    print(f'Estado Atual:\n')
-    print(f'Tempo: {time} | Aging: {quantum}')
-    print(f'Executando: ', end='')
-    if exec != None: print(f'{exec.name} | Prioridade: {exec.priority} | Tempo restante: {exec.burstList[0]}', end='')
-    print(f'\nFila de Pronto:')
-    for p in readyQueue:
-        print(f'   {p.name} | Prioridade: {p.priority} | Tempo restante: {p.burstList[0]}')
-    print(f'Fila de Espera:')
-    for p in waitQueue:
-        print(f'   {p.name} | Prioridade: {p.priority} | Tempo restante: {p.ioList[0]}')
-    
-    
-    print("---------------------------------------------")
+    with open("out.txt", "a") as out:
+        out.write(f'Estado Atual:\n')
+        out.write(f'Tempo: {time} | Aging: {quantum}\n')
+        out.write(f'Executando: ')
+        if exec != None: out.write(f'{exec.name} | Prioridade: {exec.priority} | Tempo restante: {exec.burstList[0]}\n')
+        out.write(f'Fila de Pronto:\n')
+        for p in readyQueue:
+            out.write(f'   {p.name} | Prioridade: {p.priority} | Tempo restante: {p.burstList[0]}\n')
+        out.write(f'Fila de Espera:\n')
+        for p in waitQueue:
+            out.write(f'   {p.name} | Prioridade: {p.priority} | Tempo restante: {p.ioList[0]}\n')
+        out.write("---------------------------------------------\n")
     
 
 time = 0
@@ -135,7 +136,8 @@ enterNewProcesses()
     
 #Processing Loop base:
 #While there are processes in the system
-print("Escalonador com Prioridade, Aging e Preemp:\n")
+with open("out.txt", "w") as out:
+    out.write("Escalonador com Prioridade, Aging e Preemp:\n\n")
 
 while(exec or readyQueue or waitQueue):
     
